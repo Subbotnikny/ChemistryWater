@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Викторина: Вода</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: rgba(0, 0, 50, 0.6);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #a0e9ff;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .question {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #00ffff;
+        }
+
+        .question h3 {
+            margin-top: 0;
+            color: #00ffff;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .option {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background-color: rgba(0, 123, 255, 0.5);
+            border-left: 5px solid #007bff;
+        }
+
+        .option.correct {
+            background-color: rgba(40, 167, 69, 0.5);
+            border-left: 5px solid #28a745;
+        }
+
+        .option.incorrect {
+            background-color: rgba(220, 53, 69, 0.5);
+            border-left: 5px solid #dc3545;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+            min-width: 200px;
+            text-align: center;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #495057);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #218838);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .result {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.2em;
+            display: none;
+        }
+
+        .score {
+            font-size: 1.5em;
+            color: #00ffff;
+            margin: 20px 0;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            height: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .btn {
+                min-width: 150px;
+                padding: 10px 15px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Викторина: Вода</h1>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progress"></div>
+        </div>
+        
+        <div id="quiz-container">
+            <!-- Вопросы будут загружаться здесь -->
+        </div>
+        
+        <div class="btn-group" id="button-group">
+            <button class="btn" id="submit">Проверить ответ</button>
+            <button class="btn btn-secondary" id="next" style="display: none;">Следующий вопрос</button>
+            <button class="btn btn-success" id="hint" style="display: none;">Подсказка</button>
+        </div>
+        
+        <div class="result" id="result">
+            <h2>Ваш результат:</h2>
+            <div class="score" id="score"></div>
+            <p id="result-text"></p>
+            <div class="btn-group">
+                <button class="btn" id="restart">Пройти заново</button>
+                <button class="btn btn-secondary" id="review">Просмотреть ответы</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+    {
+        question: "Какая формула у воды?",
+        options: ["H2O", "CO2", "O2", "H2SO4"],
+        answer: 0,
+        explanation: "Формула воды — H₂O. Она состоит из двух атомов водорода и одного атома кислорода."
+    },
+    {
+        question: "При какой температуре вода замерзает?",
+        options: ["0°C", "100°C", "50°C", "-10°C"],
+        answer: 0,
+        explanation: "При нормальном давлении вода замерзает при 0°C."
+    },
+    {
+        question: "При какой температуре вода закипает?",
+        options: ["90°C", "100°C", "80°C", "70°C"],
+        answer: 1,
+        explanation: "При нормальном атмосферном давлении вода закипает при 100°C."
+    },
+    {
+        question: "Какой агрегатное состояние не бывает у воды?",
+        options: ["Твердое", "Газообразное", "Жидкое", "Плазменное"],
+        answer: 3,
+        explanation: "Плазменное состояние не характерно для воды при обычных условиях."
+    },
+    {
+        question: "Как называется процесс перехода воды из жидкости в пар?",
+        options: ["Конденсация", "Испарение", "Плавление", "Замерзание"],
+        answer: 1,
+        explanation: "Испарение — это переход воды из жидкого состояния в газообразное."
+    },
+    {
+        question: "Что такое конденсация?",
+        options: ["Замерзание воды", "Переход воды в лед", "Переход пара в воду", "Переход воды в пар"],
+        answer: 2,
+        explanation: "Конденсация — это переход воды из пара в жидкость."
+    },
+    {
+        question: "Как называется круговорот воды в природе?",
+        options: ["Водный цикл", "Круговорот энергии", "Цикл углерода", "Гидрогенизация"],
+        answer: 0,
+        explanation: "Круговорот воды в природе называется водным циклом."
+    },
+    {
+        question: "Какая часть Земли покрыта водой?",
+        options: ["30%", "50%", "71%", "90%"],
+        answer: 2,
+        explanation: "Примерно 71% поверхности Земли покрыто водой."
+    },
+    {
+        question: "Какая вода считается питьевой?",
+        options: ["Морская", "Дистиллированная", "Грязная", "Чистая пресная"],
+        answer: 3,
+        explanation: "Питьевой является чистая пресная вода, безопасная для употребления."
+    },
+    {
+        question: "Где содержится наибольшее количество пресной воды?",
+        options: ["Океаны", "Реки", "Ледники", "Атмосфера"],
+        answer: 2,
+        explanation: "Основной объём пресной воды сосредоточен в ледниках."
+    },
+    {
+        question: "Как называется наука, изучающая воду?",
+        options: ["Биология", "Гидрология", "Экология", "Химия"],
+        answer: 1,
+        explanation: "Гидрология — наука, изучающая воду и водные ресурсы."
+    },
+    {
+        question: "Какое вещество растворяется в воде и придаёт ей солёный вкус в морях?",
+        options: ["Глюкоза", "Хлорид натрия", "Кальций", "Кислород"],
+        answer: 1,
+        explanation: "Морская вода солёная из-за растворённого хлорида натрия (NaCl)."
+    },
+    {
+        question: "Почему лёд плавает на воде?",
+        options: ["Он тяжелее воды", "Он легче воды", "Он растворяется", "Он плотнее воды"],
+        answer: 1,
+        explanation: "Плотность льда меньше плотности воды, поэтому он плавает."
+    },
+    {
+        question: "Что из перечисленного не загрязняет воду?",
+        options: ["Мыло", "Нефть", "Бумага", "Пластик"],
+        answer: 2,
+        explanation: "Бумага быстрее разлагается и меньше загрязняет воду по сравнению с другими веществами."
+    },
+    {
+        question: "Какой орган человека содержит больше всего воды?",
+        options: ["Кости", "Кожа", "Мозг", "Печень"],
+        answer: 2,
+        explanation: "Мозг человека состоит примерно на 75% из воды."
+    },
+    {
+        question: "Сколько процентов воды в теле человека?",
+        options: ["30%", "50%", "70%", "90%"],
+        answer: 2,
+        explanation: "Тело взрослого человека состоит примерно на 70% из воды."
+    },
+    {
+        question: "Какой океан самый глубокий?",
+        options: ["Атлантический", "Индийский", "Северный Ледовитый", "Тихий"],
+        answer: 3,
+        explanation: "Самый глубокий океан — Тихий океан."
+    },
+    {
+        question: "Можно ли пить морскую воду?",
+        options: ["Да", "Нет", "Да, если она холодная", "Да, если смешать с сахаром"],
+        answer: 1,
+        explanation: "Морская вода содержит много соли и непригодна для питья."
+    },
+    {
+        question: "Что делает фильтр для воды?",
+        options: ["Добавляет соли", "Нагревает воду", "Удаляет загрязнения", "Добавляет вкус"],
+        answer: 2,
+        explanation: "Фильтр очищает воду от загрязнений и вредных веществ."
+    },
+    {
+        question: "Какое из этих состояний воды наблюдается при 0°C?",
+        options: ["Пар", "Только лёд", "Только жидкость", "Лёд и вода одновременно"],
+        answer: 3,
+        explanation: "При 0°C вода может находиться одновременно в твёрдом и жидком состоянии — при плавлении или замерзании."
+    }
+];
+
+        const quizContainer = document.getElementById('quiz-container');
+        const submitBtn = document.getElementById('submit');
+        const nextBtn = document.getElementById('next');
+        const hintBtn = document.getElementById('hint');
+        const restartBtn = document.getElementById('restart');
+        const reviewBtn = document.getElementById('review');
+        const resultContainer = document.getElementById('result');
+        const scoreElement = document.getElementById('score');
+        const resultText = document.getElementById('result-text');
+        const progressBar = document.getElementById('progress');
+        const buttonGroup = document.getElementById('button-group');
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedOption = null;
+        let quizCompleted = false;
+        let userAnswers = [];
+
+        function loadQuestion() {
+            if (currentQuestion >= questions.length) {
+                showResult();
+                return;
+            }
+
+            const question = questions[currentQuestion];
+            quizContainer.innerHTML = `
+                <div class="question">
+                    <h3>Вопрос ${currentQuestion + 1}/${questions.length}: ${question.question}</h3>
+                    <div class="options">
+                        ${question.options.map((option, index) => `
+                            <div class="option" data-index="${index}">
+                                <span>${String.fromCharCode(65 + index)}.</span> ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="explanation" id="explanation"></div>
+                </div>
+            `;
+
+            progressBar.style.width = `${((currentQuestion) / questions.length) * 100}%`;
+
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', function() {
+                    if (quizCompleted) return;
+                    
+                    document.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    this.classList.add('selected');
+                    selectedOption = parseInt(this.getAttribute('data-index'));
+                });
+            });
+
+            submitBtn.style.display = 'inline-block';
+            nextBtn.style.display = 'none';
+            hintBtn.style.display = 'none';
+            selectedOption = null;
+        }
+
+        function checkAnswer() {
+            if (selectedOption === null) {
+                alert('Пожалуйста, выберите вариант ответа!');
+                return;
+            }
+
+            const question = questions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            const explanation = document.getElementById('explanation');
+
+            options.forEach(option => {
+                option.style.cursor = 'default';
+            });
+
+            options.forEach((option, index) => {
+                if (index === question.answer) {
+                    option.classList.add('correct');
+                } else if (index === selectedOption && index !== question.answer) {
+                    option.classList.add('incorrect');
+                }
+            });
+
+            explanation.style.display = 'block';
+            explanation.innerHTML = `<strong>Объяснение:</strong> ${question.explanation}`;
+
+            if (selectedOption === question.answer) {
+                score++;
+            }
+
+            userAnswers.push({
+                question: question.question,
+                userAnswer: question.options[selectedOption],
+                correctAnswer: question.options[question.answer],
+                isCorrect: selectedOption === question.answer,
+                explanation: question.explanation
+            });
+
+            submitBtn.style.display = 'none';
+            nextBtn.style.display = 'inline-block';
+            hintBtn.style.display = 'none';
+        }
+
+        function showHint() {
+            const question = questions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+            const correctIndex = question.answer;
+            
+            options.forEach((option, index) => {
+                if (index === correctIndex) {
+                    option.style.backgroundColor = 'rgba(40, 167, 69, 0.3)';
+                    option.style.borderLeft = '3px solid #28a745';
+                }
+            });
+            
+            hintBtn.style.display = 'none';
+        }
+
+        function showResult() {
+            quizContainer.style.display = 'none';
+            buttonGroup.style.display = 'none';
+            resultContainer.style.display = 'block';
+            
+            progressBar.style.width = '100%';
+
+            const percentage = Math.round((score / questions.length) * 100);
+            scoreElement.textContent = `${score} из ${questions.length} (${percentage}%)`;
+            
+            if (percentage >= 90) {
+                resultText.textContent = 'Превосходно! Вы настоящий эксперт в ряду активности металлов!';
+            } else if (percentage >= 70) {
+                resultText.textContent = 'Очень хорошо! Вы хорошо разбираетесь в химии металлов.';
+            } else if (percentage >= 50) {
+                resultText.textContent = 'Хороший результат! Повторите материал для улучшения знаний.';
+            } else {
+                resultText.textContent = 'Попробуйте еще раз! Рекомендуем изучить ряд активности металлов.';
+            }
+            
+            quizCompleted = true;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            quizCompleted = false;
+            userAnswers = [];
+            quizContainer.style.display = 'block';
+            buttonGroup.style.display = 'flex';
+            resultContainer.style.display = 'none';
+            loadQuestion();
+        }
+
+        function reviewAnswers() {
+            let reviewHTML = '<div class="question"><h3>Просмотр ответов:</h3>';
+            
+            userAnswers.forEach((item, index) => {
+                reviewHTML += `
+                    <div style="margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px;">
+                        <p><strong>Вопрос ${index + 1}:</strong> ${item.question}</p>
+                        <p style="color: ${item.isCorrect ? '#28a745' : '#dc3545'}">
+                            Ваш ответ: ${item.userAnswer} ${item.isCorrect ? '✓' : '✗'}
+                        </p>
+                        <p>Правильный ответ: ${item.correctAnswer}</p>
+                        <div class="explanation" style="display: block;">
+                            <strong>Объяснение:</strong> ${item.explanation}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            reviewHTML += '</div>';
+            quizContainer.innerHTML = reviewHTML;
+            quizContainer.style.display = 'block';
+            resultContainer.style.display = 'none';
+            buttonGroup.style.display = 'none';
+            
+            const backBtn = document.createElement('button');
+            backBtn.className = 'btn';
+            backBtn.textContent = 'Назад к результатам';
+            backBtn.style.margin = '20px auto';
+            backBtn.style.display = 'block';
+            backBtn.onclick = () => {
+                quizContainer.style.display = 'none';
+                resultContainer.style.display = 'block';
+            };
+            
+            quizContainer.appendChild(backBtn);
+        }
+
+        submitBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', () => {
+            currentQuestion++;
+            loadQuestion();
+        });
+        hintBtn.addEventListener('click', showHint);
+        restartBtn.addEventListener('click', restartQuiz);
+        reviewBtn.addEventListener('click', reviewAnswers);
+
+        loadQuestion();
+    </script>
+</body>
+</html>
